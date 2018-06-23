@@ -33,7 +33,7 @@ express()
         extended: true
     }))
     .set('view engine', 'ejs')
-    .get('/', (req, res) => res.render('pages/index'))
+    .get('/', (req, res) => res.redirect('form'))
     .get('/form', (req, res) => res.render('pages/form'))
     .get('/result', (req, res) => res.redirect('form'))
     .post('/result', (req, res) => {
