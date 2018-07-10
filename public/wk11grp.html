@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Movies</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <h1>Movies</h1>
+    <div>
+        <input type="text" name="searchQuery">
+        <button type="submit">Search</button>
+    </div>
+
+    <div id="results">
+        <ul></ul>
+    </div>
+
+    <script>
+        function clearResults(selector) {
+            var element = document.querySelector(selector);
+            
+            if (element) element.innerHTML = '';
+        }
+
+        function getDetails(movieID) {
+            clearResults(`#${movieID} div`);
+
+            fetch(`http://www.omdbapi.com/?apikey=bdd7b192&i=${movieID}`)
+                .then((res) => {
+                    return res.json();
+                })
+                .then((movie) => {
+                    console.log(movie);
+                    // clearResults();
+                    var html = `<div>
+                        <img src='${movie.Poster}'>
+                        <p>Rated: ${movie.Rated}</p>
+                        <p>Release Date: ${movie.Released}</p>
+                        <p>Runtime: ${movie.Runtime}</p>
+                        <p>Plot: ${movie.Plot}</p>
+                    </div>`;
+
+                    document.getElementById(movie.imdbID).insertAdjacentHTML('beforeend', html);
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
+        }
+
+
+
+        function displayResults(results) {
+            var movies = results.Search;
+            movies.forEach(movie => {
+                document.querySelector('#results ul').insertAdjacentHTML('beforeend', `<li id='${movie.imdbID}'><h2>${movie.Title}</h2><a onclick='getDetails("${movie.imdbID}");' href='#'> Details</a></li>`);
+            });
+        }
+
+        document.querySelector('button[type="submit"]').addEventListener('click', () => {
+            var searchTerm = document.querySelector('input[name="searchQuery"]').value;
+            searchTerm = encodeURI(searchTerm);
+
+            fetch(`http://www.omdbapi.com/?apikey=bdd7b192&s=${searchTerm}`)
+                .then((res) => {
+                    return res.json();
+                })
+                .then((json) => {
+                    console.log(json);
+                    clearResults('#results ul');
+                    displayResults(json);
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
+            console.log(results);
+        });
+    </script>
+</body>
+
+</html>
