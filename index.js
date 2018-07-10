@@ -3,6 +3,8 @@ const path = require('path');
 const PORT = process.env.PORT || 5000;
 const chalk = require('chalk');
 const session = require('express-session');
+const bcrypt = require('bcrypt-nodejs');
+
 
 function calcPrice(weight, type) {
     var price = 0;
@@ -145,14 +147,15 @@ app.post('/login', (req, res) => {
         for (let row of result.rows) {
             console.log(JSON.stringify(row));
         }
-        // client.end();
+
         result = result.rows[0];
         var user = req.body.username;
         var pass = req.body.password;
         
-        // console.log(user, pass);
+        bcrypt;
+
         
-        if (user === result.username && pass === result.password) {
+        if (user === result.username && bycrypt.compareSync(pass, result.password)) {
             req.session.user = user;
             // req.session.pass = pass;
             res.json({
@@ -167,6 +170,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
+
     if (req.session.user) {
         console.log(req.session.user);
         req.session.destroy();
