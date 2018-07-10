@@ -146,23 +146,21 @@ app.post('/login', (req, res) => {
             console.log(JSON.stringify(row));
         }
         // client.end();
-        
+        result = result.rows[0];
         var user = req.body.username;
         var pass = req.body.password;
         
         // console.log(user, pass);
         
-        if (user === 'admin' && pass === 'password') {
+        if (user === result.username && pass === result.password) {
             req.session.user = user;
             // req.session.pass = pass;
             res.json({
                 success: true,
-                rows: result.rows
             });
         } else {
             res.json({
                 success: false,
-                rows: result.rows
             });
         }
     });
