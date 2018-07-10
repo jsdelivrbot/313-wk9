@@ -155,7 +155,7 @@ app.post('/login', (req, res) => {
         bcrypt;
 
         
-        if (user === result.username && bycrypt.compareSync(pass, result.password)) {
+        if (user === result.username && bcrypt.compareSync(pass, result.password)) {
             req.session.user = user;
             // req.session.pass = pass;
             res.json({
