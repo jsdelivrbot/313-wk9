@@ -1,7 +1,8 @@
 const express = require('express');
 const path = require('path');
 const PORT = process.env.PORT || 5000;
-
+const chalk = require('chalk');
+const session = require('express-session');
 
 function calcPrice(weight, type) {
     var price = 0;
@@ -33,8 +34,12 @@ app.use(express.urlencoded({extended: true}));
  
 app.set('view engine', 'ejs');
 
+app.use((req, res) => {
+    res.render('pages/404');
+});
 
-// app.get('/', (req, res) => res.redirect('form'));
+
+app.get('/', (req, res) => res.redirect('form'));
 app.get('/form', (req, res) => res.render('pages/form'));
 app.get('/result', (req, res) => res.redirect('form'));
 app.post('/result', (req, res) => {
@@ -96,8 +101,43 @@ app.get('/tags', (req, res) => {
 });
 
 
+/**************************************
+ * WK 12 team asssignment
+**************************************/
+
+/* Middleware to handle sesion */
+const checkLogin = (req, res, next) => {
+    console.log(req.session);
+
+    if (!req.session.authorized) {
+        console.log(chalk.red('You are not worthy'));
+    } else {
+        console.log(chalk.green('You are worthy'));
+    }
+
+    console.log(chalk.yellow(`${req.method}: ${req.url}`));
+    next();
+};
+
+app.use(session({
+    secret:'fuzzy Kittens',
+    resave: false,
+    saveUninitialized: true
+}));
+app.use(checkLogin);
 
 
+app.get('/getServerTime', (req, res) => {
+
+});
+
+app.post('/login', (req, res) => {
+
+});
+
+app.post('logout', (req, res) => {
+
+});
 
 
 app.listen(PORT, () => console.log(`Listening at http://localhost:${PORT}`));
