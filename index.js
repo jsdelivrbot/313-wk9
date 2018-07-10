@@ -30,13 +30,11 @@ var app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
- 
-app.set('view engine', 'ejs');
+app.use(express.urlencoded({
+    extended: true
+}));
 
-app.use((req, res) => {
-    res.render('pages/404');
-});
+app.set('view engine', 'ejs');
 
 
 app.get('/', (req, res) => res.redirect('form'));
@@ -82,7 +80,10 @@ app.get('/video/:id', (req, res) => {
 app.post('/video', (req, res) => {
     console.log('Got a POST request');
 
-    res.json({'success': true, 'title': req.body.title});
+    res.json({
+        'success': true,
+        'title': req.body.title
+    });
 });
 
 app.get('/tags', (req, res) => {
@@ -92,7 +93,7 @@ app.get('/tags', (req, res) => {
         id: 1,
         name: 'too many cats'
     }, {
-        id:0,
+        id: 0,
         name: 'brain-melting videos'
     }];
     // This really doesn't have to be stringified
@@ -103,41 +104,75 @@ app.get('/tags', (req, res) => {
 
 /**************************************
  * WK 12 team asssignment
-**************************************/
+ **************************************/
 
-/* Middleware to handle sesion */
-const checkLogin = (req, res, next) => {
-    console.log(req.session);
-
-    if (!req.session.authorized) {
-        console.log(chalk.red('You are not worthy'));
-    } else {
-        console.log(chalk.green('You are worthy'));
-    }
-
+const logRequest = (req, res, next) => {
     console.log(chalk.yellow(`${req.method}: ${req.url}`));
     next();
 };
 
+/* Middleware to handle sesion */
+const verifyLogin = (req, res, next) => {
+    if (req.session.user) {
+        next();
+    } else {
+        res.status(401);
+        res.json({messsage: 'You are\'t logged in...'});
+    }
+};
+
 app.use(session({
-    secret:'fuzzy Kittens',
+    secret: 'fuzzy Kittens',
     resave: false,
     saveUninitialized: true
 }));
-app.use(checkLogin);
+app.use(logRequest);
 
-
-app.get('/getServerTime', (req, res) => {
-
-});
 
 app.post('/login', (req, res) => {
+    var user = req.body.username;
+    var pass = req.body.password;
+
+    // console.log(user, pass);
+
+    if (user === 'admin' && pass === 'password') {
+        req.session.user = user;
+        // req.session.pass = pass;
+        res.json({
+            success: true
+        });
+    } else {
+        res.json({
+            success: false
+        });
+    }
+});
+
+app.post('/logout', (req, res) => {
+    if (req.session.user) {
+        console.log(req.session.user);
+        req.session.destroy();
+        res.json({
+            success: true
+        });
+    } else {
+        res.json({
+            success: false
+        });
+    }
 
 });
 
-app.post('logout', (req, res) => {
-
+app.get('/getServerTime', verifyLogin, (req, res) => {
+    res.json({
+        success: true,
+        time: new Date()
+    });
 });
 
+/* 404 page. Must be last! */
+app.use((req, res) => {
+    res.render('pages/404');
+});
 
 app.listen(PORT, () => console.log(`Listening at http://localhost:${PORT}`));
