@@ -140,9 +140,9 @@ app.use(logRequest);
 
 
 app.post('/login', (req, res) => {
-    client.query('SELECT * FROM users;', (err, res) => {
+    client.query('SELECT * FROM users;', (err, result) => {
         if (err) throw err;
-        for (let row of res.rows) {
+        for (let row of result.rows) {
             console.log(JSON.stringify(row));
         }
         // client.end();
